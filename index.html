@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Investment Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #2c3e50, #2980b9);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+    }
+    /* Left Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: rgba(0,0,0,0.2);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: flex-start; /* So items line up on the left */
+    }
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover; /* ensures the image is cropped to fill circular area */
+      margin-bottom: 10px;
+    }
+    .sidebar h2 {
+      margin: 0;
+      font-weight: 300;
+      font-size: 1.2rem;
+      letter-spacing: 0.5px;
+    }
+    .sub-title {
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+    .divider {
+      border: 0;
+      height: 1px;
+      background: rgba(255,255,255,0.3);
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    .sidebar button {
+      background: #3498db;
+      border: none;
+      color: #fff;
+      padding: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 1rem;
+      width: 100%;
+    }
+    .sidebar button:hover {
+      background: #2980b9;
+    }
+    /* Main Content Area */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 20px;
+    }
+    .page-title {
+      margin: 0;
+      font-weight: 300;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 10px;
+    }
+    .dashboard-container {
+      background: rgba(255, 255, 255, 0.1);
+      width: 100%;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .input-section, .output-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      border: none;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border: 2px solid #3498db;
+    }
+    .btn-calculate {
+      background-color: #3498db;
+      border: none;
+      color: white;
+      padding: 14px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      align-self: flex-start;
+    }
+    .btn-calculate:hover {
+      background-color: #2980b9;
+    }
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .results-table th, .results-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+    .results-table th {
+      text-align: left;
+      background-color: #3498db;
+    }
+    .results-table td {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    /* History Section */
+    .history {
+      width: 250px;
+      background: rgba(0,0,0,0.2);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .history h3 {
+      margin: 0;
+      font-weight: 300;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 10px;
+    }
+    .history-entry {
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .history-entry:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    /* Hide/Show Pages */
+    .hidden {
+      display: none;
+    }
+    /* Footer */
+    .footer {
+      margin-top: auto;
+      text-align: center;
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+    .footer small {
+      font-size: 0.75rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <!-- Left Sidebar -->
+  <div class="sidebar">
+    <!-- Logo Container -->
+    <div class="logo-container">
+      <!-- Replace 'logo.png' with your own file name -->
+      <img src="logo.jpeg" alt="Logo" class="logo"/>
+    </div>
+    <h2>Crypto Investment Dashboard</h2>
+    <div class="sub-title">by "Piikaa"</div>
+    <hr class="divider"/>
+    <button onclick="showForecasterPage()">Forecaster</button>
+    <button onclick="showRiskPage()">Risk Calculator</button>
+  </div>
+
+  <!-- Main Content + Right History -->
+  <div class="main">
+    <!-- FORECASTER PAGE -->
+    <div id="forecasterPage" class="dashboard-container">
+      <h1 class="page-title">Forecaster</h1>
+      <div class="input-section">
+        <label for="currencyName">Currency Name</label>
+        <input type="text" id="currencyName" placeholder="e.g., Bitcoin" />
+
+        <label for="buyPrice">Buy Price (USD)</label>
+        <input type="number" id="buyPrice" placeholder="e.g., 22000" step="any" />
+
+        <label for="investment">Investment Amount (USD)</label>
+        <input type="number" id="investment" placeholder="e.g., 1000" step="any" />
+
+        <label for="peak">Forecasted Peak (USD)</label>
+        <input type="number" id="peak" placeholder="e.g., 30000" step="any" />
+
+        <label for="stopLoss">Stop-Loss Percentage (%)</label>
+        <input type="number" id="stopLoss" placeholder="e.g., 10" step="any" />
+
+        <button class="btn-calculate" onclick="calculateForecaster()">Calculate</button>
+      </div>
+
+      <div class="output-section">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tokens Purchased</td>
+              <td id="tokensPurchased">-</td>
+            </tr>
+            <tr>
+              <td>Potential Return (USD)</td>
+              <td id="potentialReturn">-</td>
+            </tr>
+            <tr>
+              <td>Profit at Peak (USD)</td>
+              <td id="profitAtPeak">-</td>
+            </tr>
+            <tr>
+              <td>Stop-Loss Price (USD)</td>
+              <td id="stopLossPrice">-</td>
+            </tr>
+            <tr>
+              <td>Loss at Stop Loss (USD)</td>
+              <td id="lossAtStopLoss">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RISK CALCULATOR PAGE -->
+    <div id="riskPage" class="dashboard-container hidden">
+      <h1 class="page-title">Risk Calculator</h1>
+      <div class="input-section">
+        <label for="riskAsset">Asset</label>
+        <input type="text" id="riskAsset" placeholder="e.g., Ethereum" />
+
+        <label for="riskCurrentPrice">Current Price (USD)</label>
+        <input type="number" id="riskCurrentPrice" placeholder="e.g., 1500" step="any" />
+
+        <label for="riskATH">ATH (All-Time High) (USD)</label>
+        <input type="number" id="riskATH" placeholder="e.g., 4800" step="any" />
+
+        <button class="btn-calculate" onclick="calculateRisk()">Calculate</button>
+      </div>
+
+      <div class="output-section">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Drawdown (%)</td>
+              <td id="drawdown">-</td>
+            </tr>
+            <tr>
+              <td>Recovery (%)</td>
+              <td id="recovery">-</td>
+            </tr>
+            <tr>
+              <td>Risk Description</td>
+              <td id="riskDescription">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><small>All rights reserved to Ouss The Wizard Pika 2025</small></p>
+    </div>
+  </div>
+
+  <!-- History Section (Right) -->
+  <div class="history">
+    <h3>History</h3>
+    <div id="historyList">
+      <!-- Last 5 calculations for the active page will be displayed here -->
+    </div>
+  </div>
+
+  <script>
+    // ---------- PAGE TOGGLE ----------
+    const forecasterPage = document.getElementById('forecasterPage');
+    const riskPage = document.getElementById('riskPage');
+    const historyList = document.getElementById('historyList');
+
+    let activePage = 'forecaster'; // 'forecaster' or 'risk'
+
+    function showForecasterPage() {
+      forecasterPage.classList.remove('hidden');
+      riskPage.classList.add('hidden');
+      activePage = 'forecaster';
+      updateHistoryDisplay();
+    }
+
+    function showRiskPage() {
+      riskPage.classList.remove('hidden');
+      forecasterPage.classList.add('hidden');
+      activePage = 'risk';
+      updateHistoryDisplay();
+    }
+
+    // ---------- FORECASTER LOGIC & HISTORY ----------
+    let forecasterHistory = []; 
+    // We'll store objects like:
+    // {
+    //    currencyName, buyPrice, investment, forecastedPeak, stopLossPercent,
+    //    tokensPurchased, potentialReturn, profitAtPeak, stopLossPrice, lossAtStopLoss
+    // }
+
+    function calculateForecaster() {
+      const currencyName = document.getElementById('currencyName').value;
+      const buyPrice = parseFloat(document.getElementById('buyPrice').value) || 0;
+      const investment = parseFloat(document.getElementById('investment').value) || 0;
+      const forecastedPeak = parseFloat(document.getElementById('peak').value) || 0;
+      const stopLossPercent = parseFloat(document.getElementById('stopLoss').value) || 0;
+
+      // 1. Tokens Purchased
+      const tokensPurchased = (buyPrice > 0) ? (investment / buyPrice) : 0;
+      // 2. Potential Return
+      const potentialReturn = tokensPurchased * forecastedPeak;
+      // 3. Profit at Peak
+      const profitAtPeak = potentialReturn - investment;
+      // 4. Stop-Loss Price
+      const stopLossPrice = buyPrice * (1 - (stopLossPercent / 100));
+      // 5. Loss at Stop Loss
+      const totalValueAtStop = tokensPurchased * stopLossPrice;
+      const lossAtStopLoss = investment - totalValueAtStop;
+
+      // Update DOM
+      document.getElementById('tokensPurchased').textContent = tokensPurchased.toFixed(6);
+      document.getElementById('potentialReturn').textContent = potentialReturn.toFixed(2);
+      document.getElementById('profitAtPeak').textContent = profitAtPeak.toFixed(2);
+      document.getElementById('stopLossPrice').textContent = stopLossPrice.toFixed(2);
+      document.getElementById('lossAtStopLoss').textContent = lossAtStopLoss.toFixed(2);
+
+      // Save history (we only keep 5)
+      const entry = {
+        currencyName,
+        buyPrice,
+        investment,
+        forecastedPeak,
+        stopLossPercent,
+        tokensPurchased: tokensPurchased.toFixed(6),
+        potentialReturn: potentialReturn.toFixed(2),
+        profitAtPeak: profitAtPeak.toFixed(2),
+        stopLossPrice: stopLossPrice.toFixed(2),
+        lossAtStopLoss: lossAtStopLoss.toFixed(2)
+      };
+      forecasterHistory.unshift(entry);
+      if (forecasterHistory.length > 5) forecasterHistory.pop();
+
+      updateHistoryDisplay();
+    }
+
+    function loadForecasterHistoryItem(index) {
+      const item = forecasterHistory[index];
+      document.getElementById('currencyName').value = item.currencyName;
+      document.getElementById('buyPrice').value = item.buyPrice;
+      document.getElementById('investment').value = item.investment;
+      document.getElementById('peak').value = item.forecastedPeak;
+      document.getElementById('stopLoss').value = item.stopLossPercent;
+
+      document.getElementById('tokensPurchased').textContent = item.tokensPurchased;
+      document.getElementById('potentialReturn').textContent = item.potentialReturn;
+      document.getElementById('profitAtPeak').textContent = item.profitAtPeak;
+      document.getElementById('stopLossPrice').textContent = item.stopLossPrice;
+      document.getElementById('lossAtStopLoss').textContent = item.lossAtStopLoss;
+    }
+
+    // ---------- RISK CALCULATOR LOGIC & HISTORY ----------
+    let riskHistory = [];
+    // We'll store objects like:
+    // {
+    //   riskAsset, riskCurrentPrice, riskATH,
+    //   drawdown, recovery, riskDescription
+    // }
+
+    function calculateRisk() {
+      const asset = document.getElementById('riskAsset').value;
+      const currentPrice = parseFloat(document.getElementById('riskCurrentPrice').value) || 0;
+      const ath = parseFloat(document.getElementById('riskATH').value) || 0;
+
+      // 1. Drawdown (%)
+      let drawdown = 0;
+      if (ath > 0 && currentPrice < ath) {
+        drawdown = ((ath - currentPrice) / ath) * 100;
+      }
+
+      // 2. Recovery (%)
+      let recovery = 0;
+      if (currentPrice > 0 && ath > currentPrice) {
+        recovery = ((ath - currentPrice) / currentPrice) * 100;
+      }
+
+      // 3. Risk Description (example logic)
+      let riskDescription = "None";
+      if (drawdown < 30) {
+        riskDescription = "Low";
+      } else if (drawdown >= 30 && drawdown < 60) {
+        riskDescription = "Moderate";
+      } else if (drawdown >= 60) {
+        riskDescription = "High";
+      }
+
+      // Update DOM
+      document.getElementById('drawdown').textContent = drawdown.toFixed(2) + "%";
+      document.getElementById('recovery').textContent = recovery.toFixed(2) + "%";
+      document.getElementById('riskDescription').textContent = riskDescription;
+
+      // Save history
+      const entry = {
+        riskAsset: asset,
+        riskCurrentPrice: currentPrice,
+        riskATH: ath,
+        drawdown: drawdown.toFixed(2),
+        recovery: recovery.toFixed(2),
+        riskDescription
+      };
+      riskHistory.unshift(entry);
+      if (riskHistory.length > 5) riskHistory.pop();
+
+      updateHistoryDisplay();
+    }
+
+    function loadRiskHistoryItem(index) {
+      const item = riskHistory[index];
+      document.getElementById('riskAsset').value = item.riskAsset;
+      document.getElementById('riskCurrentPrice').value = item.riskCurrentPrice;
+      document.getElementById('riskATH').value = item.riskATH;
+
+      document.getElementById('drawdown').textContent = item.drawdown + "%";
+      document.getElementById('recovery').textContent = item.recovery + "%";
+      document.getElementById('riskDescription').textContent = item.riskDescription;
+    }
+
+    // ---------- HISTORY DISPLAY ----------
+    function updateHistoryDisplay() {
+      historyList.innerHTML = "";
+      
+      if (activePage === 'forecaster') {
+        // Display up to 5 from forecasterHistory
+        forecasterHistory.forEach((item, index) => {
+          const div = document.createElement('div');
+          div.classList.add('history-entry');
+          div.textContent = item.currencyName ? item.currencyName : 'Unnamed';
+          // On click, load the data
+          div.addEventListener('click', () => {
+            loadForecasterHistoryItem(index);
+            showForecasterPage();
+          });
+          historyList.appendChild(div);
+        });
+      } else {
+        // Display up to 5 from riskHistory
+        riskHistory.forEach((item, index) => {
+          const div = document.createElement('div');
+          div.classList.add('history-entry');
+          div.textContent = item.riskAsset ? item.riskAsset : 'Unnamed';
+          div.addEventListener('click', () => {
+            loadRiskHistoryItem(index);
+            showRiskPage();
+          });
+          historyList.appendChild(div);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
