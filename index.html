@@ -15,9 +15,10 @@
       background: linear-gradient(to right, #2c3e50, #2980b9);
       color: #fff;
       min-height: 100vh;
-      display: flex;
+      display: flex; /* 3-column layout: left sidebar, center main, right sidebar */
     }
-    /* Left Sidebar */
+
+    /* ----- LEFT SIDEBAR ----- */
     .sidebar {
       width: 250px;
       background-color: rgba(0,0,0,0.2);
@@ -25,7 +26,7 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
-      align-items: flex-start; /* So items line up on the left */
+      align-items: flex-start;
     }
     .logo-container {
       display: flex;
@@ -72,7 +73,8 @@
     .sidebar button:hover {
       background: #2980b9;
     }
-    /* Main Content Area */
+
+    /* ----- MAIN (CENTER) ----- */
     .main {
       flex: 1;
       display: flex;
@@ -146,11 +148,54 @@
     .results-table td {
       background-color: rgba(255, 255, 255, 0.2);
     }
-    /* History Section */
-    .history {
-      width: 250px;
-      background: rgba(0,0,0,0.2);
+
+    /* ----- RIGHT SIDEBAR: Potential Calculator + History ----- */
+    .right-sidebar {
+      width: 300px;
+      background-color: rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
       padding: 20px;
+      gap: 20px;
+    }
+
+    /* Potential Calculator Section */
+    .potential-calculator {
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .potential-calculator h3 {
+      margin: 0;
+      font-weight: 300;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 5px;
+    }
+    .mini-history {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .mini-history-entry {
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .mini-history-entry:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Main History (for Forecaster/Risk) */
+    .history {
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 15px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -170,10 +215,12 @@
     .history-entry:hover {
       background: rgba(255,255,255,0.2);
     }
-    /* Hide/Show Pages */
+
+    /* Hide/Show Pages in the Main Center */
     .hidden {
       display: none;
     }
+
     /* Footer */
     .footer {
       margin-top: auto;
@@ -188,12 +235,11 @@
   </style>
 </head>
 <body>
-  <!-- Left Sidebar -->
+  <!-- LEFT SIDEBAR -->
   <div class="sidebar">
-    <!-- Logo Container -->
     <div class="logo-container">
       <!-- Replace 'logo.png' with your own file name -->
-      <img src="logo.jpeg" alt="Logo" class="logo"/>
+      <img src="logo.png" alt="Logo" class="logo"/>
     </div>
     <h2>Crypto Investment Dashboard</h2>
     <div class="sub-title">by "Piikaa"</div>
@@ -202,7 +248,7 @@
     <button onclick="showRiskPage()">Risk Calculator</button>
   </div>
 
-  <!-- Main Content + Right History -->
+  <!-- MAIN (CENTER) -->
   <div class="main">
     <!-- FORECASTER PAGE -->
     <div id="forecasterPage" class="dashboard-container">
@@ -302,22 +348,69 @@
       </div>
     </div>
 
-    <!-- Footer -->
+    <!-- FOOTER -->
     <div class="footer">
       <p><small>All rights reserved to Ouss The Wizard Pika 2025</small></p>
     </div>
   </div>
 
-  <!-- History Section (Right) -->
-  <div class="history">
-    <h3>History</h3>
-    <div id="historyList">
-      <!-- Last 5 calculations for the active page will be displayed here -->
+  <!-- RIGHT SIDEBAR: Contains the new "Coin Full Potential Calculator" + existing "History" -->
+  <div class="right-sidebar">
+    <!-- COIN FULL POTENTIAL CALCULATOR -->
+    <div class="potential-calculator">
+      <h3>Coin Full Potential Calculator</h3>
+
+      <label for="potentialCoinName">Coin Name</label>
+      <input type="text" id="potentialCoinName" placeholder="e.g., OnyxCoin" />
+
+      <label for="potentialCurrentPrice">Current Price (USD)</label>
+      <input type="number" id="potentialCurrentPrice" placeholder="e.g., 2.50" step="any" />
+
+      <label for="potentialATH">ATH Price (USD)</label>
+      <input type="number" id="potentialATH" placeholder="e.g., 10.00" step="any" />
+
+      <button class="btn-calculate" onclick="calculatePotential()">Calculate Potential</button>
+
+      <!-- Outputs -->
+      <div class="output-section">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Potential Gain (%)</td>
+              <td id="potentialGainPercent">-</td>
+            </tr>
+            <tr>
+              <td>Gain Multiple (x)</td>
+              <td id="potentialGainMultiple">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mini-History for the Potential Calculator -->
+      <h4>Last 5 Potential Calcs</h4>
+      <div class="mini-history" id="potentialHistoryList">
+        <!-- We'll populate with up to 5 calculations, each clickable to reload. -->
+      </div>
+    </div>
+
+    <!-- HISTORY (for Forecaster/Risk) -->
+    <div class="history">
+      <h3>History</h3>
+      <div id="historyList">
+        <!-- Last 5 calculations for the active page (Forecaster or Risk) go here -->
+      </div>
     </div>
   </div>
 
   <script>
-    // ---------- PAGE TOGGLE ----------
+    // ================== PAGE TOGGLE (FORECASTER / RISK) ===================
     const forecasterPage = document.getElementById('forecasterPage');
     const riskPage = document.getElementById('riskPage');
     const historyList = document.getElementById('historyList');
@@ -338,12 +431,12 @@
       updateHistoryDisplay();
     }
 
-    // ---------- FORECASTER LOGIC & HISTORY ----------
+    // ================== FORECASTER LOGIC & HISTORY ===================
     let forecasterHistory = []; 
-    // We'll store objects like:
+    // Will store objects like:
     // {
-    //    currencyName, buyPrice, investment, forecastedPeak, stopLossPercent,
-    //    tokensPurchased, potentialReturn, profitAtPeak, stopLossPrice, lossAtStopLoss
+    //   currencyName, buyPrice, investment, forecastedPeak, stopLossPercent,
+    //   tokensPurchased, potentialReturn, profitAtPeak, stopLossPrice, lossAtStopLoss
     // }
 
     function calculateForecaster() {
@@ -372,7 +465,7 @@
       document.getElementById('stopLossPrice').textContent = stopLossPrice.toFixed(2);
       document.getElementById('lossAtStopLoss').textContent = lossAtStopLoss.toFixed(2);
 
-      // Save history (we only keep 5)
+      // Save history (max 5)
       const entry = {
         currencyName,
         buyPrice,
@@ -406,9 +499,9 @@
       document.getElementById('lossAtStopLoss').textContent = item.lossAtStopLoss;
     }
 
-    // ---------- RISK CALCULATOR LOGIC & HISTORY ----------
+    // ================== RISK CALCULATOR LOGIC & HISTORY ===================
     let riskHistory = [];
-    // We'll store objects like:
+    // Will store objects like:
     // {
     //   riskAsset, riskCurrentPrice, riskATH,
     //   drawdown, recovery, riskDescription
@@ -419,19 +512,19 @@
       const currentPrice = parseFloat(document.getElementById('riskCurrentPrice').value) || 0;
       const ath = parseFloat(document.getElementById('riskATH').value) || 0;
 
-      // 1. Drawdown (%)
+      // Drawdown (%)
       let drawdown = 0;
       if (ath > 0 && currentPrice < ath) {
         drawdown = ((ath - currentPrice) / ath) * 100;
       }
 
-      // 2. Recovery (%)
+      // Recovery (%)
       let recovery = 0;
       if (currentPrice > 0 && ath > currentPrice) {
         recovery = ((ath - currentPrice) / currentPrice) * 100;
       }
 
-      // 3. Risk Description (example logic)
+      // Simple risk description
       let riskDescription = "None";
       if (drawdown < 30) {
         riskDescription = "Low";
@@ -472,12 +565,12 @@
       document.getElementById('riskDescription').textContent = item.riskDescription;
     }
 
-    // ---------- HISTORY DISPLAY ----------
+    // ================== HISTORY DISPLAY (FOR FORECASTER / RISK) ===================
     function updateHistoryDisplay() {
       historyList.innerHTML = "";
-      
+
       if (activePage === 'forecaster') {
-        // Display up to 5 from forecasterHistory
+        // Show Forecaster history
         forecasterHistory.forEach((item, index) => {
           const div = document.createElement('div');
           div.classList.add('history-entry');
@@ -490,7 +583,7 @@
           historyList.appendChild(div);
         });
       } else {
-        // Display up to 5 from riskHistory
+        // Show Risk history
         riskHistory.forEach((item, index) => {
           const div = document.createElement('div');
           div.classList.add('history-entry');
@@ -502,6 +595,79 @@
           historyList.appendChild(div);
         });
       }
+    }
+
+    // ================== COIN FULL POTENTIAL CALCULATOR (RIGHT SIDEBAR) ===================
+    let potentialHistory = [];
+    // We'll store objects like:
+    // {
+    //   coinName, currentPrice, athPrice,
+    //   gainPercent, gainMultiple
+    // }
+
+    function calculatePotential() {
+      const coinName = document.getElementById('potentialCoinName').value;
+      const currentPrice = parseFloat(document.getElementById('potentialCurrentPrice').value) || 0;
+      const athPrice = parseFloat(document.getElementById('potentialATH').value) || 0;
+
+      let gainPercent = 0;
+      let gainMultiple = 0;
+
+      if (currentPrice > 0 && athPrice > currentPrice) {
+        // Gains if coin returns to its ATH
+        gainPercent = ((athPrice - currentPrice) / currentPrice) * 100; 
+        gainMultiple = (athPrice / currentPrice);
+      } else if (currentPrice > 0 && athPrice <= currentPrice) {
+        // If ATH is not above current price, potential gain might be 0 or negative
+        gainPercent = ((athPrice - currentPrice) / currentPrice) * 100;
+        gainMultiple = (athPrice / currentPrice);
+      }
+
+      // Update DOM
+      document.getElementById('potentialGainPercent').textContent = gainPercent.toFixed(2) + "%";
+      document.getElementById('potentialGainMultiple').textContent = gainMultiple.toFixed(2) + "x";
+
+      // Save in potentialHistory
+      const entry = {
+        coinName,
+        currentPrice,
+        athPrice,
+        gainPercent: gainPercent.toFixed(2),
+        gainMultiple: gainMultiple.toFixed(2)
+      };
+      potentialHistory.unshift(entry);
+      if (potentialHistory.length > 5) potentialHistory.pop();
+
+      updatePotentialHistoryDisplay();
+    }
+
+    function updatePotentialHistoryDisplay() {
+      const potentialHistoryList = document.getElementById('potentialHistoryList');
+      potentialHistoryList.innerHTML = "";
+
+      potentialHistory.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.classList.add('mini-history-entry');
+        // Show the coin name or fallback
+        div.textContent = item.coinName ? item.coinName : 'Unnamed';
+
+        // On click, load the data back into the calculator
+        div.addEventListener('click', () => {
+          loadPotentialHistoryItem(index);
+        });
+        potentialHistoryList.appendChild(div);
+      });
+    }
+
+    function loadPotentialHistoryItem(index) {
+      const item = potentialHistory[index];
+      document.getElementById('potentialCoinName').value = item.coinName;
+      document.getElementById('potentialCurrentPrice').value = item.currentPrice;
+      document.getElementById('potentialATH').value = item.athPrice;
+
+      // Update DOM outputs
+      document.getElementById('potentialGainPercent').textContent = item.gainPercent + "%";
+      document.getElementById('potentialGainMultiple').textContent = item.gainMultiple + "x";
     }
   </script>
 </body>
